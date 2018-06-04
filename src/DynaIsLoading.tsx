@@ -8,7 +8,7 @@ export interface IDynaIsLoadingProps {
 	show: boolean;
 	fullScreen?: boolean;
 	spinner?: JSX.Element;
-	message?: JSX.Element;
+	message?: JSX.Element | string;
 	onClick?: () => void;
 }
 
@@ -37,13 +37,18 @@ export class DynaIsLoading extends React.Component<IDynaIsLoadingProps, IDynaIsL
 
 	public componentWillReceiveProps(nextProps: IDynaIsLoadingProps): void {
 		if (nextProps.show !== this.props.show) {
-			if (nextProps.show) {
-				this.setState({renderInternalContainer: true, show: false});
-				setTimeout(() => this.setState({show: true}), 10)
+			if (nextProps.fullScreen) {
+				this.setState({renderInternalContainer: false, show: nextProps.show});
 			}
 			else {
-				this.setState({show: false});
-				setTimeout(() => this.setState({renderInternalContainer: false}), 250);
+				if (nextProps.show) {
+					this.setState({renderInternalContainer: true, show: false});
+					setTimeout(() => this.setState({show: true}), 10)
+				}
+				else {
+					this.setState({show: false});
+					setTimeout(() => this.setState({renderInternalContainer: false}), 250);
+				}
 			}
 		}
 	}
@@ -69,45 +74,49 @@ export class DynaIsLoading extends React.Component<IDynaIsLoadingProps, IDynaIsL
 				className={className}
 				onClick={onClick}
 			>
-				{spinner}
+				<div className={this.className('__spinner')}>{spinner}</div>
 				{message}
 			</div>
 		);
+	}
+
+	private renderFullScreenIsLoading(): JSX.Element {
+		const {
+			show,
+		} = this.state;
+		return (
+			<DynaModalContainer show={show}>
+				{this.renderIsLoadingContent()}
+			</DynaModalContainer>
+		);
+	}
+
+	private renderInnerIsLoading(): JSX.Element {
+		const {
+			show,
+			renderInternalContainer,
+		} = this.state;
+		if (renderInternalContainer) {
+			const className: string = [
+				this.className('__internal-container'),
+				this.className(`__internal-container--${show ? "show" : "hide"}`),
+			].join(' ').trim();
+			return (
+				<div className={className}>
+					{this.renderIsLoadingContent()}
+				</div>
+			);
+		}
+		else {
+			return null;
+		}
 	}
 
 	public render(): JSX.Element {
 		const {
 			fullScreen,
 		} = this.props;
-		const {
-			show,
-			renderInternalContainer,
-		} = this.state;
-		console.debug('show', show);
 
-		if (fullScreen) {
-			return (
-				<DynaModalContainer show={show}>
-					{this.renderIsLoadingContent()}
-				</DynaModalContainer>
-			);
-		}
-		else {
-			// not full screen, in the parent container
-			if (renderInternalContainer) {
-				const className: string = [
-					this.className('__internal-container'),
-					this.className(`__internal-container--${show ? "show" : "hide"}`),
-				].join(' ').trim();
-				return (
-					<div className={className}>
-						{this.renderIsLoadingContent()}
-					</div>
-				);
-			}
-			else {
-				return null;
-			}
-		}
+		return fullScreen ? this.renderFullScreenIsLoading() : this.renderInnerIsLoading();
 	}
 }

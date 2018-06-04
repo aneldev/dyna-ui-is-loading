@@ -5,7 +5,7 @@ export interface IDynaIsLoadingProps {
     show: boolean;
     fullScreen?: boolean;
     spinner?: JSX.Element;
-    message?: JSX.Element;
+    message?: JSX.Element | string;
     onClick?: () => void;
 }
 export interface IDynaIsLoadingState {
@@ -19,5 +19,7 @@ export declare class DynaIsLoading extends React.Component<IDynaIsLoadingProps, 
     private readonly baseClassName;
     private readonly className;
     private renderIsLoadingContent;
+    private renderFullScreenIsLoading;
+    private renderInnerIsLoading;
     render(): JSX.Element;
 }

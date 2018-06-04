@@ -28,6 +28,7 @@ export default {
 			component: (
 				<DynaIsLoading
 					show={null}
+					message={<span>loading...</span>}
 					onClick={() => console.log('spinner pressed')}
 				>dyna button</DynaIsLoading>
 			),
@@ -68,6 +69,7 @@ export default {
 					props: {
 						show: true,
 						fullScreen: true,
+						message: <span>go home to close it</span>,
 					} as IDynaIsLoadingProps
 				},
 			]
