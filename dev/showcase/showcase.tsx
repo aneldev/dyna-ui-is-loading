@@ -30,7 +30,7 @@ export default {
 					show={null}
 					message={<span>loading...</span>}
 					onClick={() => console.log('spinner pressed')}
-				>dyna button</DynaIsLoading>
+				/>
 			),
 			wrapperStyle: {
 				width: "50%",
@@ -83,7 +83,7 @@ export default {
 				<div style={{textAlign: 'center'}}>
 					<h1>The end</h1>
 					<div style={{fontSize: '20px'}}>
-						<p><a href="https://github.com/aneldev/dyna-ui-button">{faIcon('github')} Github</a></p>
+						<p><a href="https://github.com/aneldev/dyna-ui-is-loading">{faIcon('github')} Github</a></p>
 						<p><a href="https://www.npmjs.com/package/dyna-ui-button">{faIcon('square')} npm</a></p>
 					</div>
 				</div>
