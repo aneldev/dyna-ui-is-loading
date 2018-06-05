@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("react"));
+		module.exports = factory(require("react"), require("dyna-ui-modal-container"));
 	else if(typeof define === 'function' && define.amd)
-		define("dyna-ts-react-module-boilerplate", ["react"], factory);
+		define("dyna-ui-is-loading", ["react", "dyna-ui-modal-container"], factory);
 	else if(typeof exports === 'object')
-		exports["dyna-ts-react-module-boilerplate"] = factory(require("react"));
+		exports["dyna-ui-is-loading"] = factory(require("react"), require("dyna-ui-modal-container"));
 	else
-		root["dyna-ts-react-module-boilerplate"] = factory(root["react"]);
-})(typeof self !== 'undefined' ? self : this, function(__WEBPACK_EXTERNAL_MODULE_3__) {
+		root["dyna-ui-is-loading"] = factory(root["react"], root["dyna-ui-modal-container"]);
+})(typeof self !== 'undefined' ? self : this, function(__WEBPACK_EXTERNAL_MODULE_3__, __WEBPACK_EXTERNAL_MODULE_4__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -87,11 +87,8 @@ module.exports = __webpack_require__(1);
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Button_1 = __webpack_require__(2);
-exports.Button = Button_1.Button;
-exports.EStyle = Button_1.EStyle;
-exports.EColor = Button_1.EColor;
-exports.ESize = Button_1.ESize;
+var DynaIsLoading_1 = __webpack_require__(2);
+exports.DynaIsLoading = DynaIsLoading_1.DynaIsLoading;
 
 
 /***/ }),
@@ -112,59 +109,84 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(3);
-__webpack_require__(4);
-var EStyle;
-(function (EStyle) {
-    EStyle["ROUNDED"] = "ROUNDED";
-})(EStyle = exports.EStyle || (exports.EStyle = {}));
-var EColor;
-(function (EColor) {
-    EColor["WHITE_BLACK"] = "WHITE_BLACK";
-    EColor["WHITE_RED"] = "WHITE_RED";
-    EColor["BLACK_WHITE"] = "BLACK_WHITE";
-    EColor["TRANSPARENT_WHITE"] = "TRANSPARENT_WHITE";
-})(EColor = exports.EColor || (exports.EColor = {}));
-var ESize;
-(function (ESize) {
-    ESize["SMALL"] = "SMALL";
-    ESize["MEDIUM"] = "MEDIUM";
-    ESize["LARGE"] = "LARGE";
-    ESize["XLARGE"] = "XLARGE";
-})(ESize = exports.ESize || (exports.ESize = {}));
-var Button = /** @class */ (function (_super) {
-    __extends(Button, _super);
-    function Button() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.baseClassName = "my-button";
+var dyna_ui_modal_container_1 = __webpack_require__(4);
+__webpack_require__(5);
+var DynaIsLoading = /** @class */ (function (_super) {
+    __extends(DynaIsLoading, _super);
+    function DynaIsLoading(props) {
+        var _this = _super.call(this, props) || this;
+        _this.baseClassName = "dyna-is-loading";
         _this.className = function (subClassName, active) {
             if (subClassName === void 0) { subClassName = ""; }
             if (active === void 0) { active = true; }
             return active ? "" + _this.baseClassName + subClassName : "";
         };
+        _this.state = {
+            show: props.show,
+            renderInternalContainer: props.show,
+        };
         return _this;
     }
-    Button.prototype.render = function () {
-        var _a = this.props, children = _a.children, style = _a.style, color = _a.color, size = _a.size, href = _a.href, onClick = _a.onClick;
-        var className = [
-            this.className(),
-            this.className("--style-" + style),
-            this.className("--color-" + color),
-            this.className("--size-" + size),
-        ].join(' ').trim();
-        return (React.createElement("a", { className: className, href: href, onClick: onClick },
-            React.createElement("button", null, children)));
+    DynaIsLoading.prototype.componentWillReceiveProps = function (nextProps) {
+        var _this = this;
+        if (nextProps.show !== this.props.show) {
+            if (nextProps.fullScreen) {
+                this.setState({ renderInternalContainer: false, show: nextProps.show });
+            }
+            else {
+                if (nextProps.show) {
+                    this.setState({ renderInternalContainer: true, show: false });
+                    setTimeout(function () { return _this.setState({ show: true }); }, 10);
+                }
+                else {
+                    this.setState({ show: false });
+                    setTimeout(function () { return _this.setState({ renderInternalContainer: false }); }, 250);
+                }
+            }
+        }
     };
-    Button.defaultProps = {
-        children: null,
-        style: EStyle.ROUNDED,
-        color: EColor.WHITE_BLACK,
-        size: ESize.MEDIUM,
-        href: null,
+    DynaIsLoading.prototype.renderIsLoadingContent = function () {
+        var _a = this.props, userClassName = _a.className, spinner = _a.spinner, message = _a.message, onClick = _a.onClick;
+        var className = [
+            userClassName,
+            this.className(),
+        ].join(' ').trim();
+        return (React.createElement("div", { className: className, onClick: onClick },
+            React.createElement("div", { className: this.className('__spinner') }, spinner),
+            message));
+    };
+    DynaIsLoading.prototype.renderFullScreenIsLoading = function () {
+        var show = this.state.show;
+        return (React.createElement(dyna_ui_modal_container_1.DynaModalContainer, { show: show }, this.renderIsLoadingContent()));
+    };
+    DynaIsLoading.prototype.renderInnerIsLoading = function () {
+        var _a = this.state, show = _a.show, renderInternalContainer = _a.renderInternalContainer;
+        if (renderInternalContainer) {
+            var className = [
+                this.className('__internal-container'),
+                this.className("__internal-container--" + (show ? "show" : "hide")),
+            ].join(' ').trim();
+            return (React.createElement("div", { className: className }, this.renderIsLoadingContent()));
+        }
+        else {
+            return null;
+        }
+    };
+    DynaIsLoading.prototype.render = function () {
+        var fullScreen = this.props.fullScreen;
+        return fullScreen ? this.renderFullScreenIsLoading() : this.renderInnerIsLoading();
+    };
+    DynaIsLoading.defaultProps = {
+        className: '',
+        show: false,
+        fullScreen: false,
+        spinner: React.createElement("i", { className: "fa fa-circle-o-notch fa-spin fa-3x fa-fw", style: { fontSize: "62px" } }),
+        message: null,
         onClick: function () { return undefined; },
     };
-    return Button;
+    return DynaIsLoading;
 }(React.Component));
-exports.Button = Button;
+exports.DynaIsLoading = DynaIsLoading;
 
 
 /***/ }),
@@ -175,12 +197,18 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_3__;
 
 /***/ }),
 /* 4 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_4__;
+
+/***/ }),
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(5);
+var content = __webpack_require__(6);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -188,14 +216,14 @@ var transform;
 var options = {}
 options.transform = transform
 // add the styles to the DOM
-var update = __webpack_require__(7)(content, options);
+var update = __webpack_require__(8)(content, options);
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
 	// When the styles change, update the <style> tags
 	if(!content.locals) {
-		module.hot.accept("!!../node_modules/css-loader/index.js!../node_modules/postcss-loader/lib/index.js??ref--4-2!../node_modules/less-loader/dist/cjs.js!./Button.less", function() {
-			var newContent = require("!!../node_modules/css-loader/index.js!../node_modules/postcss-loader/lib/index.js??ref--4-2!../node_modules/less-loader/dist/cjs.js!./Button.less");
+		module.hot.accept("!!../node_modules/css-loader/index.js!../node_modules/postcss-loader/lib/index.js??ref--4-2!../node_modules/less-loader/dist/cjs.js!./DynaIsLoading.less", function() {
+			var newContent = require("!!../node_modules/css-loader/index.js!../node_modules/postcss-loader/lib/index.js??ref--4-2!../node_modules/less-loader/dist/cjs.js!./DynaIsLoading.less");
 			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 			update(newContent);
 		});
@@ -205,21 +233,21 @@ if(false) {
 }
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(6)(false);
+exports = module.exports = __webpack_require__(7)(false);
 // imports
 
 
 // module
-exports.push([module.i, ".my-button {\n  outline: none;\n}\n.my-button--style-ROUNDED {\n  font-size: 0;\n}\n.my-button--style-ROUNDED button {\n  outline: none;\n  border-style: solid;\n  cursor: pointer;\n  -webkit-transition: background-color 200ms ease-out;\n  transition: background-color 200ms ease-out;\n}\n.my-button--style-ROUNDED.my-button--size-SMALL button {\n  padding: 2px 8px;\n  font-size: 8px;\n  line-height: 10px;\n  border-width: 1px;\n  border-radius: 8px;\n  font-weight: bold;\n}\n.my-button--style-ROUNDED.my-button--size-SMALL button:active {\n  position: relative;\n  top: 1px;\n  left: 1px;\n}\n.my-button--style-ROUNDED.my-button--size-MEDIUM button {\n  padding: 4px 16px;\n  font-size: 14px;\n  line-height: 22px;\n  border-width: 1px;\n  border-radius: 16px;\n  font-weight: bold;\n}\n.my-button--style-ROUNDED.my-button--size-MEDIUM button:active {\n  position: relative;\n  top: 1px;\n  left: 1px;\n}\n.my-button--style-ROUNDED.my-button--size-LARGE button {\n  padding: 8px 32px;\n  font-size: 26px;\n  line-height: 46px;\n  border-width: 1px;\n  border-radius: 32px;\n  font-weight: bold;\n}\n.my-button--style-ROUNDED.my-button--size-LARGE button:active {\n  position: relative;\n  top: 2px;\n  left: 2px;\n}\n.my-button--style-ROUNDED.my-button--size-XLARGE button {\n  padding: 16px 64px;\n  font-size: 40px;\n  line-height: 92px;\n  border-width: 2px;\n  border-radius: 64px;\n  font-weight: bold;\n}\n.my-button--style-ROUNDED.my-button--size-XLARGE button:active {\n  position: relative;\n  top: 2px;\n  left: 2px;\n}\n.my-button--color-WHITE_BLACK button {\n  border-color: black;\n  background: white;\n  color: black;\n}\n.my-button--color-WHITE_BLACK button:hover {\n  background-color: #e6e6e6;\n}\n.my-button--color-WHITE_BLACK button:active {\n  background-color: #d1d1d1;\n}\n.my-button--color-WHITE_RED button {\n  border-color: red;\n  background: white;\n  color: red;\n}\n.my-button--color-WHITE_RED button:hover {\n  background-color: #e6e6e6;\n}\n.my-button--color-WHITE_RED button:active {\n  background-color: #d1d1d1;\n}\n.my-button--color-BLACK_WHITE button {\n  border-color: black;\n  background: black;\n  color: white;\n}\n.my-button--color-BLACK_WHITE button:hover {\n  background-color: #333333;\n}\n.my-button--color-BLACK_WHITE button:active {\n  background-color: #525252;\n}\n.my-button--color-TRANSPARENT_WHITE button {\n  border-color: white;\n  background: transparent;\n  color: white;\n}\n.my-button--color-TRANSPARENT_WHITE button:hover {\n  border-color: #e6e6e6;\n  color: #e6e6e6;\n}\n.my-button--color-TRANSPARENT_WHITE button:active {\n  border-color: #d1d1d1;\n  color: #d1d1d1;\n}\n", ""]);
+exports.push([module.i, ".dyna-is-loading {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n  color: gray;\n  background-color: rgba(128, 128, 128, 0.28);\n}\n.dyna-is-loading__spinner:not(:last-child) {\n  margin-bottom: 24px;\n}\n.dyna-is-loading__internal-container {\n  -webkit-transition: opacity 250ms ease-in-out;\n  transition: opacity 250ms ease-in-out;\n  opacity: 0;\n}\n.dyna-is-loading__internal-container--show {\n  opacity: 1;\n}\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -301,7 +329,7 @@ function toComment(sourceMap) {
 }
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -347,7 +375,7 @@ var singleton = null;
 var	singletonCounter = 0;
 var	stylesInsertedAtTop = [];
 
-var	fixUrls = __webpack_require__(8);
+var	fixUrls = __webpack_require__(9);
 
 module.exports = function(list, options) {
 	if (typeof DEBUG !== "undefined" && DEBUG) {
@@ -660,7 +688,7 @@ function updateLink (link, options, obj) {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

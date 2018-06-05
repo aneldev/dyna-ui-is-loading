@@ -1,1 +1,1 @@
-export { Button, IButtonProps, EStyle, EColor, ESize } from "./Button";
+export { DynaIsLoading, IDynaIsLoadingProps, } from "./DynaIsLoading";
